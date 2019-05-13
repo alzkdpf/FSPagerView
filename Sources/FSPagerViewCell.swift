@@ -18,10 +18,9 @@ open class FSPagerViewCell: UICollectionViewCell {
         }
         let view = UIView(frame: .zero)
         view.isUserInteractionEnabled = false
-        view.backgroundColor = UIColor.black.withAlphaComponent(0.6)
         
         let textLabel = UILabel(frame: .zero)
-        textLabel.textColor = .white
+        textLabel.textColor = UIColor.black
         textLabel.font = UIFont.preferredFont(forTextStyle: .body)
         self.contentView.addSubview(view)
         view.addSubview(textLabel)
@@ -29,6 +28,26 @@ open class FSPagerViewCell: UICollectionViewCell {
         textLabel.addObserver(self, forKeyPath: "font", options: [.old,.new], context: kvoContext)
         
         _textLabel = textLabel
+        return textLabel
+    }
+    
+    @objc
+    open var subLabel: UILabel? {
+        if let _ = _subLabel {
+            return _subLabel
+        }
+        let view = UIView(frame: .zero)
+        view.isUserInteractionEnabled = false
+        
+        let textLabel = UILabel(frame: .zero)
+        textLabel.textColor = UIColor.lightGray
+        textLabel.font = UIFont.preferredFont(forTextStyle: .body)
+        self.contentView.addSubview(view)
+        view.addSubview(textLabel)
+        
+        textLabel.addObserver(self, forKeyPath: "font", options: [.old,.new], context: kvoContext)
+        
+        _subLabel = textLabel
         return textLabel
     }
     
@@ -46,6 +65,7 @@ open class FSPagerViewCell: UICollectionViewCell {
     
     fileprivate weak var _textLabel: UILabel?
     fileprivate weak var _imageView: UIImageView?
+    fileprivate weak var _subLabel: UILabel?
     
     fileprivate let kvoContext = UnsafeMutableRawPointer(bitPattern: 0)
     fileprivate let selectionColor = UIColor(white: 0.2, alpha: 0.2)
@@ -101,10 +121,10 @@ open class FSPagerViewCell: UICollectionViewCell {
     fileprivate func commonInit() {
         self.contentView.backgroundColor = UIColor.clear
         self.backgroundColor = UIColor.clear
-        self.contentView.layer.shadowColor = UIColor.black.cgColor
-        self.contentView.layer.shadowRadius = 5
-        self.contentView.layer.shadowOpacity = 0.75
-        self.contentView.layer.shadowOffset = .zero
+//        self.contentView.layer.shadowColor = UIColor.black.cgColor
+//        self.contentView.layer.shadowRadius = 5
+//        self.contentView.layer.shadowOpacity = 0.75
+//        self.contentView.layer.shadowOffset = .zero
     }
     
     deinit {
@@ -123,7 +143,7 @@ open class FSPagerViewCell: UICollectionViewCell {
                 var rect = self.contentView.bounds
                 let height = textLabel.font.pointSize*1.5
                 rect.size.height = height
-                rect.origin.y = self.contentView.frame.height-height
+                rect.origin.y = self.contentView.frame.height
                 return rect
             }()
             textLabel.frame = {
@@ -134,6 +154,24 @@ open class FSPagerViewCell: UICollectionViewCell {
                 return rect
             }()
         }
+        
+        if let subTextLabel = _subLabel {
+            subTextLabel.superview!.frame = {
+                var rect = self.contentView.bounds
+                let height = subTextLabel.font.pointSize*1.5
+                rect.size.height = height
+                rect.origin.y = self.contentView.frame.height+height
+                return rect
+            }()
+            subTextLabel.frame = {
+                var rect = subTextLabel.superview!.bounds
+                rect = rect.insetBy(dx: 8, dy: 0)
+                rect.size.height -= 1
+                rect.origin.y += 1
+                return rect
+            }()
+        }
+        
         if let selectedForegroundView = _selectedForegroundView {
             selectedForegroundView.frame = self.contentView.bounds
         }
